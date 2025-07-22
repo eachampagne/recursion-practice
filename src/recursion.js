@@ -5,21 +5,69 @@
 // Example:  5! = 5 x 4 x 3 x 2 x 1 = 120
 // factorial(5);  // 120
 var factorial = function(n) {
- 
+	//edge case - negative number
+	if (n < 0) {
+		return null;
+	} else if (n === 0) { //base case - 0! = 1
+		//note that no n === 1 case is necessary
+		return 1;
+	}
+	//recursive case
+	return n * factorial(n - 1);
 };
 
 // 2. Compute the sum of an array of integers.
 // Example:  sum([1, 2, 3, 4, 5, 6]);  // 21
 var sum = function(array) {
+	if (array.length === 0) return 0; //base case - empty array has sum 0
+
+	return array[0] + sum(array.slice(1)); //recursive case
 };
 
 // 3. Sum all numbers in an array containing nested arrays.
 // Example: arraySum([1,[2,3],[[4]],5]); // 15
 var arraySum = function(array) {
+	/* my first thought
+	let sum = 0; //base case of empty array will return 0
+
+	for (let i = 0; i < array.length; i++) {
+		if (Array.isArray(array[i])) {
+			sum += arraySum(array[i]); //recursive case - if an element is a subarray, arraySum must be called on it
+		} else {
+			sum += array[i]; //number elements don't need arraySum 
+		}
+	}
+
+	return sum;
+	*/
+
+	//more recursion
+	if (array.length === 0) return 0; //base case - empty array has sum 0
+
+	//recursive case
+	//in this version, unlike the flat array version, subarrays need arraySum called on them
+	//the ternary operator checks whether the first element is an array or not, which determines whether the element is added directly or subArray is called on it
+	return (Array.isArray(array[0]) ? arraySum(array[0]) : array[0]) + arraySum(array.slice(1));
 };
 
 // 4. Check if a number is even.
 var isEven = function(n) {
+	//this was in Eloquent JS
+	
+	//even base case - 0
+	if (n === 0) return true;
+	//odd base case - 1
+	//it doesn't really matter if this is an if or an else if, and a plain if looks neater
+	if (n === 1) return false;
+
+	//recursive cases
+	if (n > 0) {
+		return isEven(n - 2); //for positive numbers, move downwards towards the 0 and 1 base cases
+		//subtracting 2 conserves parity
+	} else { //only case left is negative, since positive and zero are handled
+		return isEven(n + 2); //for negative numbers, move upwards towards the 0 and 1 base cases
+		//adding 2 converves parity
+	}
 };
 
 // 5. Sum all integers below a given integer.
@@ -31,6 +79,27 @@ var sumBelow = function(n) {
 // 6. Get the integers in range (x, y).
 // Example:  range(2, 9);  // [3, 4, 5, 6, 7, 8]
 var range = function(x, y) {
+	//edge case - no numbers between x and y
+	if (Math.abs(y - x) < 2) return [];
+
+	//case x < y
+	if (x < y) {
+		//base case - x and y two apart
+		if (y - x === 2) {
+			return [x + 1]; //equivalently, [y - 1]
+		}
+
+		//recursive case - return number just after x, then adjust the range in the recursive call
+		return [x + 1].concat(range(x+1, y));
+	} else { //case y < x
+		//base case - x and y two apart
+		if (x - y === 2) {
+			return [x - 1]; //equivalently, [y + 1]
+		}
+
+		//recursive case - return number just below x, then adjust range for recursive call
+		return [x - 1].concat(range(x - 1, y));
+	}
 };
 
 // 7. Compute the exponent of a number.
@@ -46,6 +115,17 @@ var exponent = function(base, exp) {
 // powerOfTwo(16); // true
 // powerOfTwo(10); // false
 var powerOfTwo = function(n) {
+	//negative inputs are an edge case
+	//I think they're not actually powers of two
+	//There is no n that satisfies 2^n < 0
+	//as written this function will return false for negative numbers, which I suppose is good
+
+	//base cases - 1 is a power of 2 (the 0th), anything less than 1 is a fraction and therefore not a power of two
+	if (n === 1) return true;
+	if (n < 1) return false;
+
+	//recursive case - divide by 2 and call again
+	return powerOfTwo(n / 2);
 };
 
 // 9. Write a function that accepts a string a reverses it.
@@ -69,6 +149,13 @@ var modulo = function(x, y) {
 // JavaScript's Math object.
 // ATTENTION DO NOT LEAVE COMMENTS IN THIS FUNCTION. The test is looking for any ('/').
 var multiply = function(x, y) {
+	if (y === 0) return 0;
+
+	if (y > 0) {
+		return x + multiply(x, y - 1);
+	} else {
+		return -x + multiply(x, y + 1);
+	}
 };
 
 // 13. Write a function that divides two numbers without using the / operator  or
@@ -106,6 +193,13 @@ var reverseArr = function (array) {
 // buildList(0,5) // [0,0,0,0,0]
 // buildList(7,3) // [7,7,7]
 var buildList = function(value, length) {
+	//edge case - negative length
+	if (length < 0) return null;
+	//base case
+	if (length === 0) return [];
+
+	//recursive case - create an array of length 1, then call buildList recursive to create the rest of the array
+	return [value].concat(buildList(value, length - 1));
 };
 
 // 19. Count the occurence of a value inside a list.
@@ -176,11 +270,42 @@ var capitalizeFirst = function(array) {
 // };
 // nestedEvenSum(obj1); // 10
 var nestedEvenSum = function(obj) {
+	//initialize sum
+	let sum = 0;
+
+	for (let key in obj) {
+		if (typeof obj[key] === "number") {
+			if (obj[key] % 2 === 0) {
+				sum += obj[key]; //sum even numbers
+			} 
+		} else if (typeof obj[key] === "object") {
+			//it seems this will work for arrays, since the indices are "like" keys (?)
+			//I think this will even work for dates and stuff - they'll just bypass the for loop and return 0
+			sum += nestedEvenSum(obj[key]); //recursive step - call nestedEvenSum on sub-objects
+		}
+		//ignore values of other types (strings, etc)
+	}
+
+	//return sum. If there are no even numbers in the input object, this will return 0 ("base case")
+	return sum;
 };
 
 // 29. Flatten an array containing nested arrays.
 // Example: flatten([1,[2],[3,[[4]]],5]); // [1,2,3,4,5]
 var flatten = function(arrays) {
+	//base case - empty array
+	if (arrays.length === 0) return [];
+
+	//recursive case
+
+	//if the first element is a subarray, first is that array flattened
+	//otherwise first is simply a flat array consisting of the first element
+	let first = Array.isArray(arrays[0]) ? flatten(arrays[0]) : [arrays[0]];
+
+	//concatenate [first] with the rest of the processed array
+	//note that first + flatten() will NOT work because it will merge them stringwise
+	let rest = flatten(arrays.slice(1));
+	return first.concat(flatten(arrays.slice(1)));
 };
 
 // 30. Given a string, return an object containing tallies of each letter.
@@ -194,6 +319,21 @@ var letterTally = function(str, obj) {
 // Example: compress([1, 2, 2, 3, 4, 4, 5, 5, 5]) // [1, 2, 3, 4, 5]
 // Example: compress([1, 2, 2, 3, 4, 4, 2, 5, 5, 5, 4, 4]) // [1, 2, 3, 4, 2, 5, 4]
 var compress = function(list) {
+	//base case - empty array
+	if (list.length === 0) {
+		return [];
+	}
+
+	//recursive case
+	const rest = compress(list.slice(1));
+
+	//only include the first element if it's not a duplicate with the first element of rest
+	//if they're the same, omit it
+	if (list[0] === rest[0]) {
+		return rest;
+	} else {
+		return [list[0]].concat(rest);
+	}
 };
 
 // 32. Augment every element in a list with a new value where each element is an array
@@ -219,6 +359,36 @@ var alternateSign = function(array) {
 // Assume all numbers are single digits (less than 10).
 // numToText("I have 5 dogs and 6 ponies"); // "I have five dogs and six ponies"
 var numToText = function(str) {
+	//base case - empty string
+	if (str === "") {
+		return "";
+	}
+
+	const conversion = {
+		"0": "zero",
+		"1": "one",
+		"2": "two",
+		"3": "three",
+		"4": "four",
+		"5": "five",
+		"6": "six",
+		"7": "seven",
+		"8": "eight",
+		"9": "nine"
+	};
+
+	//check if first character needs to be converted
+	//this could be a one-line ternary operator
+	let first;
+	if (conversion.hasOwnProperty(str[0])) {
+		first = conversion[str[0]];
+	} else {
+		first = str[0];
+	}
+
+	//recursive case - return the first character/word plus the result of processing the rest of the string
+	return first + numToText(str.slice(1));
+
 };
 
 // *** EXTRA CREDIT ***
