@@ -108,6 +108,17 @@ var range = function(x, y) {
 // Example:  exponent(4,3);  // 64
 // https://www.khanacademy.org/computing/computer-science/algorithms/recursive-algorithms/a/computing-powers-of-a-number
 var exponent = function(base, exp) {
+	//only handles integer exponents - fractional exponents with recurse forever (or until it crashes)
+
+	//base case - exp = 0
+	if (exp === 0) return 1;
+
+	//recurse towards an exponent of 0, depending on whether the exponent is positive or negative
+	if (exp > 0) { //positive exponents
+		return exponent(base, exp - 1) * base;
+	} else { //negative exponents
+		return exponent(base, exp + 1) / base; //x^-n = 1 / x^n
+	}
 };
 
 // 8. Determine if a number is a power of two.
@@ -141,7 +152,37 @@ var palindrome = function(string) {
 // modulo(5,2) // 1
 // modulo(17,5) // 2
 // modulo(22,6) // 4
+
+//Comments moved out of function
+
+//edge case - negative y
+//it looks like x % -y = x % y in JavaScript
+//I don't know why
+//The Wiki page on modulo has FIVE ways to define modulo
+//JavaScript and Python, for instance, give different answers for 4 % -3
+//Apparently this is what they meant when they said JavaScript technically had a remainder operator rather than a modulo operator
+//I don't think there are even any test cases for negative values but I wrote a check anyway
+
+//I didn't even consider the y=0 edge case - just happened to notice that the Wiki page said different implentations treat this differently
+//Apparently JS gives NaN for x % 0
 var modulo = function(x, y) {
+	if (y < 0) return modulo(x, -y);
+
+	if (y === 0) return NaN;
+
+	if (x >= 0) {
+		if (x < y) {
+			return x;
+		} else {
+			return modulo(x-y, y);
+		}
+	} else {
+		if (-x < y) {
+			return x;
+		} else {
+			return modulo(x+y, y);
+		}
+	}
   
 };
 
@@ -206,12 +247,25 @@ var buildList = function(value, length) {
 // countOccurrence([2,7,4,4,1,4], 4) // 3
 // countOccurrence([2,'banana',4,4,1,'banana'], 'banana') // 2
 var countOccurrence = function(array, value) {
+	//base case - empty array
+	if (array.length === 0) return 0;
+
+	//recursive case
+	//uses ternary operator to determine if array[0] is the target value, then adds 1 or 0 to the count of the rest of the array accordingly
+	return (array[0] === value ? 1 : 0) + countOccurrence(array.slice(1), value);
 };
 
 // 20. Write a recursive version of map.
 // rMap([1,2,3], timesTwo); // [2,4,6]
 var rMap = function(array, callback, output=[]) {
-  
+	//base case - empty array
+	if (array.length === 0) return output;
+
+	//recursive case
+	output.push(callback(array[0])); //unlike regular map(), this can't pass the index or the whole array because it doesn't have them
+
+	//process the rest of the array
+	return rMap(array.slice(1), callback, output);
 };
 
 // 21. Write a function that counts the number of times a key occurs in an object.
@@ -219,6 +273,21 @@ var rMap = function(array, callback, output=[]) {
 // countKeysInObj(testobj, 'r') // 1
 // countKeysInObj(testobj, 'e') // 2
 var countKeysInObj = function(obj, key) {
+	//initialize count
+	//"base case" is that the key is not found and the return value is 0 
+	let count = 0; 
+
+	for (let k in obj) {
+		if (k === key) {
+			count += 1; //increment count for matching keys
+		}
+		//this can't be an else-if - a given key might be the target, and also have anested object as its value
+		if (typeof obj[k] === "object") {
+			count += countKeysInObj(obj[k], key); //recursive case - call countKeysInObj on sub-objects and add to count
+		}
+	}
+
+	return count;
 };
 
 // 22. Write a function that counts the number of times a value occurs in an object.
@@ -226,11 +295,43 @@ var countKeysInObj = function(obj, key) {
 // countValuesInObj(testobj, 'r') // 2
 // countValuesInObj(testobj, 'e') // 1
 var countValuesInObj = function(obj, value) {
+	//very similar to countKeysInObj, except that it's checking values rather than keys
+
+	//initialize count
+	//"base case" is that the value is not found and the return value is 0 
+	let count = 0; 
+
+	for (let key in obj) {
+		if (obj[key] === value) {
+			count += 1; //increment count for matching keys
+		}
+		//also can't be an else-if - you could, in theory, be searching for an object (by reference)
+		if (typeof obj[key] === "object") {
+			count += countValuesInObj(obj[key], value); //recursive case - call countValuesInObj on sub-objects and add to count
+		}
+	}
+
+	return count;
 };
 
 // 23. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
 var replaceKeysInObj = function(obj, key, newKey) {
+	//loop over object's keys
+	for(let k in obj) {
+		//recursively edit nested objects before changing the keys
+		if (typeof obj[k] === "object") {
+			obj[k] = replaceKeysInObj(obj[k], key, newKey);
+		}
+
+		//now rename the current key, if necessary
+		if (k === key) {
+			obj[newKey] = obj[key]
+			delete obj[key];
+		}
+	}
+
+	return obj;
 };
 
 // 24. Get the first n Fibonacci numbers.  In the Fibonacci Sequence, each subsequent
@@ -239,6 +340,20 @@ var replaceKeysInObj = function(obj, key, newKey) {
 // fibonacci(5);  // [0, 1, 1, 2, 3, 5]
 // Note:  The 0 is not counted.
 var fibonacci = function(n) {
+	//base cases - <= 0 and 1
+	if (n <= 0) return null;
+	if (n === 1) return [0, 1];
+
+	//recursive cases
+	
+	//get previous sequence
+	const prev = fibonacci(n-1);
+	
+	//compute current element
+	const nth = prev[prev.length - 2] + prev[prev.length - 1];
+
+	//add current element to array and return
+	return prev.concat(nth);
 };
 
 // 25. Return the Fibonacci number located at index n of the Fibonacci sequence.
@@ -253,11 +368,27 @@ var nthFibo = function(n) {
 // var words = ['i', 'am', 'learning', 'recursion'];
 // capitalizedWords(words); // ['I', 'AM', 'LEARNING', 'RECURSION']
 var capitalizeWords = function(input) {
+	//base case - empty array
+	if (input.length === 0) return [];
+
+	//recursive case
+	const capitalized = input[0].toUpperCase();
+
+	return [capitalized].concat(capitalizeWords(input.slice(1)));
 };
 
 // 27. Given an array of strings, capitalize the first letter of each index.
 // capitalizeFirst(['car', 'poop', 'banana']); // ['Car', 'Poop', 'Banana']
 var capitalizeFirst = function(array) {
+	//like capitalizeWords, except words are changed to title case rather than uppercase
+
+	//base case - empty array
+	if (array.length === 0) return [];
+
+	//recursive case
+	const capitalized = array[0][0].toUpperCase() + array[0].slice(1);
+
+	return [capitalized].concat(capitalizeFirst(array.slice(1)));
 };
 
 // 28. Return the sum of all even numbers in an object containing nested objects.
@@ -310,7 +441,19 @@ var flatten = function(arrays) {
 
 // 30. Given a string, return an object containing tallies of each letter.
 // letterTally('potato'); // {'p':1, 'o':2, 't':2, 'a':1}
-var letterTally = function(str, obj) {
+var letterTally = function(str, obj={}) {
+	//base case - empty string
+	if (str === "") return obj;
+
+	//if current letter already exists in obj, increment the count
+	if (obj.hasOwnProperty(str[0])) {
+		obj[str[0]] += 1;
+	} else { //otherwise add a new property with a count of one
+		obj[str[0]] = 1;
+	}
+
+	//process the rest of the string
+	return letterTally(str.slice(1), obj);
 };
 
 // 31. Eliminate consecutive duplicates in a list.  If the list contains repeated
@@ -346,6 +489,20 @@ var augmentElements = function(array, aug) {
 // minimizeZeroes([2,0,0,0,1,4]) // [2,0,1,4]
 // minimizeZeroes([2,0,0,0,1,0,0,4]) // [2,0,1,0,4]
 var minimizeZeroes = function(array) {
+	//like compress(), except only affects 0's
+	
+	//base case - empty array
+	if (array.length === 0) return [];
+
+	//recursive case
+	const rest = minimizeZeroes(array.slice(1));
+
+	//if current element and rest's first element are BOTH 0, omit current element and just return rest
+	if (array[0] === 0 && rest[0] === 0) {
+		return rest;
+	} else { //otherwise include current element
+		return [array[0]].concat(rest);
+	}
 };
 
 // 34. Alternate the numbers in an array between positive and negative regardless of
