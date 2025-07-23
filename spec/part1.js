@@ -83,8 +83,8 @@
       });
   
   
-  
-      xdescribe('3. Sum Integers in Array', function() {
+      //originally x'ed out
+      describe('3. Sum Integers in Array', function() {
   
         it('should return a number', function() {
           expect(typeof(arraySum([[1],[2,3],[[4]],5,6]))).to.eql('number');
@@ -401,8 +401,8 @@
       });
   
   
-  
-      xdescribe('11. Modulo', function() {
+      //originally x'ed out 
+      describe('11. Modulo', function() {
   
         it('should return a number', function() {
           expect(typeof(modulo(5,2))).to.equal('number');
@@ -475,8 +475,8 @@
       });
   
   
-  
-      xdescribe('13. Divide', function() {
+      //originally x'ed out 
+      describe('13. Divide', function() {
   
         it('should return a number', function() {
           expect(typeof(divide(5,2))).to.equal('number');
@@ -511,8 +511,8 @@
       });
   
   
-  
-      xdescribe('14. Greatest Common Divisor', function() {
+      //originally x'ed out
+      describe('14. Greatest Common Divisor', function() {
   
         it('should return a number', function() {
           expect(typeof(gcd(4,36))).to.equal('number');
@@ -725,8 +725,8 @@
       });
   
   
-  
-      xdescribe('21. Count key in object', function() {
+      //originally x'ed out 
+      describe('21. Count key in object', function() {
         var input = {'e': {'x':'y'}, 't':{'r': {'e':'r'}, 'p': {'y':'r'}},'y':'e'};
   
         it('should return a number', function() {
@@ -755,8 +755,8 @@
       });
   
   
-  
-      xdescribe('22. Count value in object', function() {
+      //originally x'ed out
+      describe('22. Count value in object', function() {
         var input = {'e': {'x':'y'}, 't':{'r': {'e':'r'}, 'p': {'y':'r'}},'y':'e'};
   
         it('should return a number', function() {
@@ -785,8 +785,8 @@
       });
   
   
-  
-      xdescribe('23. Replace keys in object', function() {
+      //originally x'ed out  
+      describe('23. Replace keys in object', function() {
   
         var tallyKeys = function(obj) {
           var count = 0;
@@ -849,8 +849,8 @@
   
       });
   
-  
-      xdescribe('24. First n Fibonacci', function() {
+      //originally x'ed out 
+      describe('24. First n Fibonacci', function() {
   
         it('should return an array', function() {
           expect(Array.isArray(fibonacci(5))).to.equal(true);
@@ -960,8 +960,8 @@
       });
   
   
-  
-      xdescribe('28. Sum even numbers in nested objects', function() {
+      //originally x'ed out 
+      describe('28. Sum even numbers in nested objects', function() {
         var obj = {
           a: 2,
           b: {b: 2, bb: {b: 3, bb: {b: 2}}},
@@ -989,8 +989,8 @@
       });
   
   
-  
-      xdescribe('29. Flatten nested arrays', function() {
+      //originally x'ed out  
+      describe('29. Flatten nested arrays', function() {
   
         it('should return an array', function() {
           expect(Array.isArray(flatten([1,[2],[3,[[4]]],5]))).to.equal(true);
@@ -1072,8 +1072,8 @@
       });
   
   
-  
-      xdescribe('32. Augment each element in nested arrays', function() {
+      //originally x'ed out 
+      describe('32. Augment each element in nested arrays', function() {
   
         it('should return an array', function() {
           expect(Array.isArray(augmentElements([[],[3],[7]], 5))).to.equal(true);
