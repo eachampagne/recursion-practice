@@ -74,6 +74,23 @@ var isEven = function(n) {
 // sumBelow(10); // 45
 // sumBelow(7); // 21
 var sumBelow = function(n) {
+	if (n >= 0) {
+		//base case - less than or equal to 1
+		if (n <= 1) {
+			return 0;
+		}
+
+		//recursive case
+		return (n-1) + sumBelow(n-1);
+	} else { //negative n
+		//base case - greater than or equal to -1
+		if (n >= -1) {
+			return 0;
+		}
+
+		//recursive case
+		return (n+1) + sumBelow(n+1);
+	}
 };
 
 // 6. Get the integers in range (x, y).
@@ -141,10 +158,38 @@ var powerOfTwo = function(n) {
 
 // 9. Write a function that accepts a string a reverses it.
 var reverse = function(string) {
+	//base case - empty string
+	if (string.length === 0) {
+		return "";
+	}
+
+	//recursive case
+	//deliberately ensuring the recursive call is the very last thing - I'm not sure whether that makes the code more optimized (tail recursion? I don't really understand that yet)
+	//of course you could also
+	//return reverse(string.slice(1)) + string[0];
+	//which is actually a bit easier to read...
+	//hmm
+	//I don't know how to benchmark yet
+	return string[string.length - 1] + reverse(string.slice(0, string.length - 1));
 };
 
 // 10. Write a function that determines if a string is a palindrome.
 var palindrome = function(string) {
+	string = string.trim(); //removes leading or trailing whitespace so a space is never the compared character
+
+	//base cases - empty strings and one letter strings both count as palindromes
+	if (length.string === 0 || string.length === 1) return true;
+
+	//recursive case
+	
+	//check if first and last letter are the same
+	//the first and last letter being the same doesn't guarantee that the word of is a palindrome, but them being different DOES guarantee that it ISN'T
+	if (string[0].toLowerCase() === string[string.length - 1].toLowerCase()) {
+		//if so, slice them off and check the "inner" string (recursively)
+		return palindrome(string.slice(1, string.length - 1));
+	} else { //if not, return false
+		return false;
+	}
 };
 
 // 11. Write a function that returns the remainder of x divided by y without using the
@@ -201,7 +246,43 @@ var multiply = function(x, y) {
 
 // 13. Write a function that divides two numbers without using the / operator  or
 // JavaScript's Math object.
+
+//I have to assume this is only going to give us numbers that divide evenly
+//Update: this was incorrect and my function never finished
+//Switched to just truncating the division once abs(x) < abs(y)
+//Apparently that's sufficient... that's good
+//I couldn't figure out how I would start getting into the decimal part without using multiplication, which isn't allowed
+
+//Comments moved out
+
+//edge case - division by zero
+//this does not give the same results as a regular division because regular division gives +/- Infinity, not NaN
+
+//the ridiculous ternary operator expression is a complicated way of comparing the absolute values of x and y without calling Math.abs()
+//The "base case" is abs(x) < abs(y), in which case there's not enough divident "left" to divide out another divisor, so return 0 and end (rather than recursing endlessly bouncing back and forth around 0)
+
+//The ^ is the bitwise XOR operator (I had to look up what symbol to use, but I'm familiar with the logical operator)
+//XOR's truth table is:
+//	T^T => F
+//	T^F => T
+//	F^T => T
+//	F^F => F
+//In this case it's a way to check whether x and y have the same sign, regardless of which sign they have
+//Mismatched signs are the first branch (the if statement), while matching signs are the else branch
+//The return statements have to be different to (1) make sure x is moving toward zero and (2) make sure the accumulating answer has the same sign
+//It happens you can use the same return expression for matching signs (regardless of whether x and y are both positive or both negative) and mismatched signs (regardless of which is positive and which is negative)
+//I did not rigorously prove this - I just tried it out (originally with a more explicit 4 branch if/else if chain) and confirmed I got the right signs out
+
 var divide = function(x, y) {
+	if (y === 0) return NaN;
+
+	if ((x >= 0 ? x : -x) < (y >= 0 ? y : -y)) return 0;
+
+	if (y < 0 ^ x < 0) {
+		return -1 + divide(x+y, y);
+	} else {
+		return 1 + divide(x-y, y);
+	}
 };
 
 // 14. Find the greatest common divisor (gcd) of two positive numbers.  The GCD of two
@@ -210,7 +291,17 @@ var divide = function(x, y) {
 // http://www.cse.wustl.edu/~kjg/cse131/Notes/Recursion/recursion.html
 // https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/the-euclidean-algorithm
 var gcd = function(x, y) {
-  
+	//edge case - negative inputs
+	if (x < 0 || y < 0) return null;
+
+	//base cases
+	if (x === 0) return y;
+	if (y === 0) return x;
+
+	//recursive case - Euclid's algorithm (which I'd never heard of before this)
+	let a = x % y;
+
+	return gcd(y, a);
 };
 
 // 15. Write a function that compares each character of two strings and returns true if
@@ -219,16 +310,40 @@ var gcd = function(x, y) {
 // compareStr('', '') // true
 // compareStr('tomato', 'tomato') // true
 var compareStr = function(str1, str2) {
+	//base cases
+	if (str1 === "" && str2 === "") return true;
+
+	//tests if only one string is empty but the other isn't
+	if (str1 === "" ^ str2 === "") return false;
+
+	//recursive case
+	if (str1[0] !== str2[0]) {
+		//the first letters being different guarantees the strings are different
+		return false;
+	} else {
+		//but them being the same doesn't guarantee the whole string is the same, so recursively check the substrings
+		return compareStr(str1.slice(1), str2.slice(1));
+	}
 };
 
 // 16. Write a function that accepts a string and creates an array where each letter
 // occupies an index of the array.
 var createArray = function(str){
+	//base case
+	if (str.length === 0) return [];
+
+	//recursive case
+	return [str[0]].concat(createArray(str.slice(1)));
 };
 
 // 17. Reverse the order of an array
 var reverseArr = function (array) {
-};
+	//base case
+	if (array.length === 0) return [];
+
+	//recursive case
+	return [array[array.length - 1]].concat(reverseArr(array.slice(0, array.length - 1)));
+}
 
 // 18. Create a new array with a given value and length.
 // buildList(0,5) // [0,0,0,0,0]
@@ -362,6 +477,15 @@ var fibonacci = function(n) {
 // nthFibo(7); // 13
 // nthFibo(3); // 2
 var nthFibo = function(n) {
+	//edge case - negative n
+	if (n < 0) return null;
+
+	//base cases
+	if (n === 0) return 0;
+	if (n === 1) return 1;
+
+	//recursive case
+	return nthFibo(n-2) + nthFibo(n-1);
 };
 
 // 26. Given an array of words, return a new array containing each word capitalized.
@@ -483,6 +607,14 @@ var compress = function(list) {
 // itself.
 // Example: augmentElements([[],[3],[7]], 5); // [[5],[3,5],[7,5]]
 var augmentElements = function(array, aug) {
+	//base case
+	if (array.length === 0) return [];
+
+	//recursive case
+	let subArray = array[0];
+	subArray.push(aug);
+
+	return [subArray].concat(augmentElements(array.slice(1), aug));
 };
 
 // 33. Reduce a series of zeroes to a single 0.
@@ -509,7 +641,20 @@ var minimizeZeroes = function(array) {
 // their original sign.  The first number in the index always needs to be positive.
 // alternateSign([2,7,8,3,1,4]) // [2,-7,8,-3,1,-4]
 // alternateSign([-2,-7,8,3,-1,4]) // [2,-7,8,-3,1,-4]
+
+// I have no idea what the test means by "should remove excess zeroes" - none of the test inputs have zeroes, and I didn't test for zeroes...
 var alternateSign = function(array) {
+	//base cases
+	if (array.length === 0) return [];
+	if (array.length === 1) return [Math.abs(array[0])]; //make sure a 1 element array is positive
+
+	//recursive
+	let prev = alternateSign(array.slice(0, array.length - 1));
+
+	//make sure element to add has the opposite sign as the last element of the array constructed so far
+	let toAdd = prev[prev.length - 1] >= 0 ? -Math.abs(array[array.length - 1]) : Math.abs(array[array.length - 1]);
+
+	return prev.concat(toAdd);
 };
 
 // 35. Given a string, return a string with digits converted to their word equivalent.
