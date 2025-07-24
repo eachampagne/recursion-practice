@@ -710,6 +710,57 @@ var binarySearch = function(array, target, min, max) {
 // Sample array:  [34,7,23,32,5,62]
 // Sample output: [5,7,23,32,34,62]
 var mergeSort = function(array) {
+	//base case
+	if (array.length === 1) return array; 
+
+	//divide and sort halves
+	const midpoint = Math.floor(array.length / 2);
+	
+	let half1 = mergeSort(array.slice(0, midpoint));
+	let half2 = mergeSort(array.slice(midpoint));
+
+	//merge
+
+	let sorted = [];
+
+	//since half1 and half2 are each sorted, we just move upwards through them both and move the lower of the two terms to the sorted array
+
+	//i tracks on half1, j tracks on half2
+	let i = 0;
+	let j = 0;
+	
+	//there's some special handling in case one half runs out first
+	while(i < half1.length || j < half2.length) {
+		let item1;
+		let item2;
+
+		//avoid indexing out of bounds
+		if (i < half1.length) {
+			item1 = half1[i];
+		}
+		if (j < half2.length) {
+			item2 = half2[j];
+		}
+
+		//if both item1 and item2 are defined, push the smaller of the two
+		if (item1 && item2) {
+			if (item1 <= item2) {
+				sorted.push(item1);
+				i++;
+			} else {
+				sorted.push(item2);
+				j++;
+			}
+		} else if (item1) { //if half2 runs out first
+			sorted.push(item1);
+			i++;
+		} else { //if half1 runs out first
+			sorted.push(item2);
+			j++;
+		}
+	}
+
+	return sorted;
 };
 
 
