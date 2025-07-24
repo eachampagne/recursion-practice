@@ -704,6 +704,27 @@ var tagCount = function(tag, node) {
 // console.log(binarySearch(5)) will return '5'
 
 var binarySearch = function(array, target, min, max) {
+	//this only works if the input array is sorted
+
+	//make sure min and max are defined, so that the initial call doesn't have to give them
+	//You could actually use default parameters for this because default params can refer to previous arguments
+	if (!min) min = 0;
+	if (!max) max = array.length; //not (array.length - 1) b/c the max is exclusive
+
+	//search the array halfway between min and max
+	//index can equal min, but not max (unless min and max are equal)
+	let index = Math.floor((max - min) / 2) + min;
+	let searched = array[index];
+
+	if (searched === target) {
+		return index; //base case - found
+	} else if ((max - min) <= 1) {
+		return null; //base case - not found and nowhere else to look
+	} else if (searched < target) {
+		return binarySearch(array, target, index, max); //recursive case - target in top half
+	} else { 
+		return binarySearch(array, target, min, index); //recursive case - target in bottom half
+	}
 };
 
 // 38. Write a merge sort function.
