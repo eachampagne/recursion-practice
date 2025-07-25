@@ -697,6 +697,31 @@ var numToText = function(str) {
 
 // 36. Return the number of times a tag occurs in the DOM.
 var tagCount = function(tag, node) {
+	//note that this has at least one bug / unhandled edge case
+	//tagCount('html') returns 2, I think because it picks up the <!DOCTYPE HTML> thing in addition to the actual <html> tag
+	//I tried switching from node.nodeName to node.tagName (with a hasOwnProperty check) and that gave the wrong result for at least one of the test cases
+	//I really don't know much about interacting with the DOM yet so I'm going to leave it as it
+
+	//make sure node is defined - set to the entire document if not passed a child node
+	if (!node) node = document;
+
+	let count = 0;
+
+	//check if current node is tag
+	if (node.nodeName.toLowerCase() === tag.toLowerCase()) {
+		//console.log(node); // ->  logs the nodes that match the target tag - helpful while debugging
+		count += 1;
+	}
+
+	//iterate over any child nodes and call tagCount() on them
+	//https://developer.mozilla.org/en-US/docs/Web/API/Node#recurse_through_child_nodes
+	if (node.hasChildNodes()){
+		for (let child of node.childNodes) {
+			count += tagCount(tag, child);
+		}
+	}
+
+	return count;
 };
 
 // 37. Write a function for binary search.
